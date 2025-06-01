@@ -1,6 +1,9 @@
 # collect-urls.sh
 this scripts 4th tools modyfy katana,hakrawler,waybackurls,gau
 
+useages: bash collect-urls.sh example.com
+or bash collect-urls.sh exmpale.txt
+
 
 #!/bin/bash
 
