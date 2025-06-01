@@ -1,55 +1,35 @@
-# collect-urls.sh
-this scripts 4th tools modyfy katana,hakrawler,waybackurls,gau
-
-useages: bash collect-urls.sh example.com
-or bash collect-urls.sh exmpale.txt
-
-
 #!/bin/bash
 
-# -------- Configuration --------
-domain_input=$1
-output_dir="output"
-mkdir -p "$output_dir"
+# ─────────────────────────────
+#    🔍 Shuvo's crt.sh Tool 🔍
+# ─────────────────────────────
 
-# -------- Function: Process single domain --------
-collect_urls() {
-    domain=$1
-    echo "[*] Collecting URLs for: $domain"
+clear
+echo "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+echo "|     ..| search crt.sh v1.1 by Shuvo |.. |"
+echo "+  site : crt.sh Certificate Search       +"
+echo "|       Twitter: @ShuvoRecon              |"
+echo "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+echo
 
-    # katana
-    echo "[*] Running katana..."
-    katana -u "$domain" -silent >> "$output_dir/katana_$domain.txt"
-
-    # hakrawler
-    echo "[*] Running hakrawler..."
-    echo "$domain" | hakrawler -subs -depth 2 >> "$output_dir/hakrawler_$domain.txt"
-
-    # gau
-    echo "[*] Running gau..."
-    echo "$domain" | gau >> "$output_dir/gau_$domain.txt"
-
-    # waybackurls
-    echo "[*] Running waybackurls..."
-    echo "$domain" | waybackurls >> "$output_dir/waybackurls_$domain.txt"
-}
-
-# -------- Input check --------
-if [[ -f "$domain_input" ]]; then
-    echo "[*] File detected. Running for all domains in $domain_input"
-    while read -r line; do
-        collect_urls "$line"
-    done < "$domain_input"
-elif [[ "$domain_input" =~ ^[a-zA-Z0-9.-]+$ ]]; then
-    echo "[*] Single domain detected."
-    collect_urls "$domain_input"
-else
-    echo "Usage: $0 <domain.com> or <subdomain.txt>"
-    exit 1
+# Usage Instruction
+if [ -z "$1" ]; then
+  echo "Usage: $0 \"Organization Name\""
+  echo "Example: $0 \"Google LLC\""
+  exit 1
 fi
 
-# -------- Merge and Cleanup --------
-echo "[*] Merging and cleaning..."
-cat "$output_dir"/*.txt | sort -u > "$output_dir/final_urls.txt"
-echo "[*] Total Unique URLs Collected: $(wc -l < "$output_dir/final_urls.txt")"
-echo "[*] Output saved in: $output_dir/final_urls.txt"
+# Input org name
+ORG_NAME="$1"
+ENCODED_ORG=$(echo "$ORG_NAME" | sed 's/ /%20/g')
+OUTPUT_FILE="cert_urls.txt"
+
+echo "[*] Searching crt.sh for organization: $ORG_NAME"
+curl -s "https://crt.sh/?O=$ENCODED_ORG" |
+grep -oP '(?<=<TD>)[a-zA-Z0-9*.-]+\.[a-zA-Z]{2,}(?=</TD>)' |
+grep -vE '^(\|\s)$' |
+sort -u > "$OUTPUT_FILE"
+
+echo
+echo "[+] Found $(wc -l < $OUTPUT_FILE) unique subdomains!"
+echo "[+] Saved to $OUTPUT_FILE"
