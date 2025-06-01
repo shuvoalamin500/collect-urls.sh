@@ -1,3 +1,10 @@
+script name: shuvo-crt.sh
+install: permission chmod +x  shuvo-crt.sh
+runs: ./ shuvo-crt.sh org name.example
+
+
+
+
 #!/bin/bash
 
 # ─────────────────────────────
